@@ -39,22 +39,15 @@
   :group 'helm-rubygems
   :type 'string)
 
-;; TODO - put this in rubygems-search
-(defun rubygems-request (request-url api-key)
-  "Given the string REQUEST-URL and the API-KEY, performs a request to rubygems.org's api"
-  (let ((url-mime-accept-string  "application/json")
-		(url-request-extra-headers
-		 (list (cons "Authorization" api-key))))
-	(url-retrieve-synchronously request-url)))
-
 (defun rubygems-search (search-term)
   "Given the string SEARCH-TERM, returns a parsed JSON list of results"
   (with-current-buffer
-      ;; TODO - PAGINATION!
-      (rubygems-request
-       (concat "https://rubygems.org/api/v1/"
-	       (format "search?query=%s" (url-hexify-string search-term)))
-       api-key)
+	  (let ((url-mime-accept-string  "application/json")
+			(url-request-extra-headers
+			 (list (cons "Authorization" api-key))))
+		(url-retrieve-synchronously
+		 (concat "https://rubygems.org/api/v1/"
+				 (format "search?query=%s" (url-hexify-string search-term)))))
     (goto-char (+ 1 url-http-end-of-headers))
     (json-read)))
 
