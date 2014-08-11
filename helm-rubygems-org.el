@@ -42,10 +42,9 @@
 ;; TODO - put this in rubygems-search
 (defun rubygems-request (request-url api-key)
   "Given the string REQUEST-URL and the API-KEY, performs a request to rubygems.org's api"
-  (let ((url-request-extra-headers
+  (let ((url-mime-accept-string  "application/json")
+		(url-request-extra-headers
 		 (list (cons "Authorization" api-key))))
-    ;; TODO, change this from a setq?
-	(setq url-mime-accept-string  "application/json")
 	(url-retrieve-synchronously request-url)))
 
 (defun rubygems-search (search-term)
