@@ -61,7 +61,10 @@
 
 (defun rubygems-gem-descriptor (descriptor gem-candidate)
   "Returns the value descriptor by the DESCRIPTOR symbol for GEM-CANDIDATE parsed rubygems resource representation"
-  (cdr (assoc descriptor gem-candidate)))
+  (lexical-let ((descriptor-cell (assoc descriptor gem-candidate)))
+	(if descriptor-cell
+		(cdr descriptor-cell)
+	  nil)))
 
 (defun rubygems-candidate-kill-new (gem-candidate)
   "Populates the kill-ring with a string suitable for including an a Gemfile"
@@ -76,8 +79,10 @@
 
 (defun rubygems-candidate-browse-source-code (gem-candidate)
   "Opens a browser to source_code_uri of then GEM-CANDIDATE"
-  (helm-browse-url
-   (rubygems-gem-descriptor 'source_code_uri gem-candidate)))
+  (lexical-let ((source-uri (rubygems-gem-descriptor 'source_uri gem-candidate)))
+	(if source-uri
+		(helm-browse-url source-uri)
+	  (rubygems-candidate-browse gem-candidate))))
 
 (defun rubygems-search-format (search-results)
   "Formats the parsed json SEARCH-RESULTS, return a list of cons cells, whose car is the gem's name and version, and whose cdr is the resource itself"
