@@ -84,18 +84,14 @@
 		(helm-browse-url source-uri)
 	  (rubygems-candidate-browse gem-candidate))))
 
-(defun rubygems-search-format (search-results)
-  "Formats the parsed json SEARCH-RESULTS, return a list of cons cells, whose car is the gem's name and version, and whose cdr is the resource itself"
-  (mapcar (lambda (gem-candidate)
-	    (cons (format "%s ~> %s"
-			  (rubygems-gem-descriptor 'name gem-candidate)
-			  (rubygems-gem-descriptor 'version gem-candidate))
-		  gem-candidate))
-	  search-results))
-
 (defun helm-rubygems-search ()
   "Returns a list of gem candidates suitable for helm"
-  (rubygems-search-format (rubygems-search helm-pattern)))
+  (mapcar (lambda (gem-candidate)
+			(cons (format "%s ~> %s"
+						  (rubygems-gem-descriptor 'name gem-candidate)
+						  (rubygems-gem-descriptor 'version gem-candidate))
+				  gem-candidate))
+		  (rubygems-search helm-pattern)))
 
 (defvar helm-source-rubygems-search
   '((name . "Rubygems.org")
