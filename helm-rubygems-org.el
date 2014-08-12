@@ -29,6 +29,7 @@
 
 (require 'json)
 (require 'url)
+(require 'cl-lib)
 
 (defgroup helm-rubygems nil
   "Customizations for search online for rubygems"
@@ -41,15 +42,22 @@
 
 (defun rubygems-search (search-term)
   "Given the string SEARCH-TERM, returns a parsed JSON list of results"
-  (with-current-buffer
-	  (let ((url-mime-accept-string  "application/json")
-			(url-request-extra-headers
-			 (list (cons "Authorization" api-key))))
-		(url-retrieve-synchronously
-		 (concat "https://rubygems.org/api/v1/"
-				 (format "search?query=%s" (url-hexify-string search-term)))))
-    (goto-char (+ 1 url-http-end-of-headers))
-    (json-read)))
+  (cl-flet ((get-page (page-number)
+					  (with-current-buffer
+						   (let ((url-mime-accept-string  "application/json")
+								 (url-request-extra-headers
+								  (list (cons "Authorization" api-key))))
+							 (url-retrieve-synchronously
+							  (concat "https://rubygems.org/api/v1/"
+									  (format "search?query=%s&page=%d" (url-hexify-string search-term) page-number))))
+						 (goto-char (+ 1 url-http-end-of-headers))
+						 (json-read))))
+	(cl-loop for page-number from 1 to 3
+			 for candidates = (get-page page-number)
+			 until (eq (length candidates) 0)
+			 append (mapcar (lambda (candidate)
+							  candidate)
+							candidates))))
 
 (defun rubygems-gem-descriptor (descriptor gem-candidate)
   "Returns the value descriptor by the DESCRIPTOR symbol for GEM-CANDIDATE parsed rubygems resource representation"
