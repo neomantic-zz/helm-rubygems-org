@@ -79,9 +79,9 @@
 
 (defun rubygems-candidate-browse-source-code (gem-candidate)
   "Opens a browser to source_code_uri of then GEM-CANDIDATE"
-  (lexical-let ((source-uri (rubygems-gem-descriptor 'source_uri gem-candidate)))
-    (if source-uri
-	(helm-browse-url source-uri)
+  (lexical-let ((source-code-uri (rubygems-gem-descriptor 'source_code_uri gem-candidate)))
+    (if source-code-uri
+	(helm-browse-url source-code-uri)
       (rubygems-candidate-browse gem-candidate))))
 
 (defun helm-rubygems-search ()
