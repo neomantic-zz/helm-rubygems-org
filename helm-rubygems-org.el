@@ -80,9 +80,9 @@
 (defun rubygems-candidate-browse-source-code (gem-candidate)
   "Opens a browser to source_code_uri of then GEM-CANDIDATE"
   (lexical-let ((source-uri (rubygems-gem-descriptor 'source_uri gem-candidate)))
-	(if source-uri
-		(helm-browse-url source-uri)
-	  (rubygems-candidate-browse gem-candidate))))
+    (if source-uri
+	(helm-browse-url source-uri)
+      (rubygems-candidate-browse gem-candidate))))
 
 (defun helm-rubygems-search ()
   "Returns a list of gem candidates suitable for helm"
