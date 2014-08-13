@@ -103,9 +103,9 @@
 	       ("Browse source code project" . rubygems-candidate-browse-source-code)
 	       ("Browse on rubygems.org" . rubygems-candidate-browse)))))
 
-(defun helm-rubygems ()
+(defun helm-rubygems-org ()
   "List Rubygems"
   (interactive)
   (helm :sources 'helm-source-rubygems-search :buffer "*helm-rubygems*"))
 
-(provide 'helm-rubygems)
+(provide 'helm-rubygems-org)
