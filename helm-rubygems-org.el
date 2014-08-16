@@ -1,10 +1,10 @@
-;;; hub.el --- An Emacs Lisp Library for the Github API v3
+;; helm-rubygems-org.el ---
 
 ;; Copyright (C) 2014 Chad Albers
 
 ;; Author: Chad Albers <calbers@neomantic.com>
 ;; URL: https://github.com/neomantic/helm-rubygems
-;; Version: 0.5.0
+;; Version: 0.0.1
 ;; Keywords: ruby, rubygems, gemfile
 ;; Package-Requires: ()
 
