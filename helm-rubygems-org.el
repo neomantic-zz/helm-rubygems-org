@@ -1,3 +1,5 @@
+;;; -*- lexical-binding: t -*-
+
 ;; helm-rubygems-org.el ---
 
 ;; Copyright (C) 2014 Chad Albers
@@ -42,7 +44,7 @@
 
 (defun helm-rubygems-gem-description (gem-candidate)
   "Given a deserialized JSON gem representation, show a description of the gem in a new buffer"
-  (lexical-let* ((name (rubygems-gem-descriptor 'name gem-candidate))
+  (let* ((name (rubygems-gem-descriptor 'name gem-candidate))
 		 (buffer-name
 		  (format "*rubygems.org: %s*" name)))
     (if (get-buffer buffer-name)
@@ -67,7 +69,7 @@
 	       ("Homepage" . homepage_uri)
 	       ("Source Code" . source_code_uri))
 	     do
-	     (lexical-let ((uri (rubygems-gem-descriptor (cdr link-pair) gem-candidate)))
+	     (let ((uri (rubygems-gem-descriptor (cdr link-pair) gem-candidate)))
 	       (if uri
 		   (progn
 		     (insert-button (car link-pair)
@@ -100,7 +102,7 @@
 
 (defun rubygems-gem-descriptor (descriptor gem-candidate)
   "Returns the value descriptor by the DESCRIPTOR symbol for GEM-CANDIDATE parsed rubygems resource representation"
-  (lexical-let ((descriptor-cell (assoc descriptor gem-candidate)))
+  (let ((descriptor-cell (assoc descriptor gem-candidate)))
     (if descriptor-cell
 	(cdr descriptor-cell)
       nil)))
@@ -122,7 +124,7 @@
 
 (defun rubygems-candidate-browse-source-code (gem-candidate)
   "Opens a browser to source_code_uri of then GEM-CANDIDATE"
-  (lexical-let ((source-code-uri (rubygems-gem-descriptor 'source_code_uri gem-candidate)))
+  (let ((source-code-uri (rubygems-gem-descriptor 'source_code_uri gem-candidate)))
     (if source-code-uri
 	(helm-browse-url source-code-uri)
       (rubygems-candidate-browse gem-candidate))))
