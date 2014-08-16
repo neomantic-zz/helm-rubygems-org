@@ -31,13 +31,13 @@
 (require 'url)
 (require 'cl-lib)
 
-(defgroup helm-rubygems nil
+(defgroup helm-rubygems-org nil
   "Customizations for search online for rubygems"
   :group 'helm)
 
 (defcustom rubygems-api-key nil
   "The API Key issued by rubygems.org, required to its use API"
-  :group 'helm-rubygems
+  :group 'helm-rubygems-org
   :type 'string)
 
 (defun rubygems-search (search-term)
