@@ -51,34 +51,36 @@
 	(switch-to-buffer buffer-name)
       (progn
        	(generate-new-buffer buffer-name)
-	(set-buffer buffer-name)
-	(insert name)
-	(newline 2)
-	(insert (rubygems-gem-descriptor 'info gem-candidate))
-	(newline 2)
-	(insert "Click to copy to kill ring: ")
-	(insert-button (rubygems-format-for-gemfile gem-candidate)
-		       'action (lambda (button)
-				 (rubygems-candidate-kill-new gem-candidate))
-		       'follow-link t
-		       'point (point)
-		       'buffer (current-buffer))
-	(newline 2)
-	(cl-loop for link-pair in
-	     '(("Project Page" . project_uri)
-	       ("Homepage" . homepage_uri)
-	       ("Source Code" . source_code_uri))
-	     do
-	     (let ((uri (rubygems-gem-descriptor (cdr link-pair) gem-candidate)))
-	       (if uri
-		   (progn
-		     (insert-button (car link-pair)
-				    'action (lambda (button)
-					      (helm-browse-url uri))
-				    'follow-link t
-				    'point (point)
-				    'buffer (current-buffer))
-		     (insert "  ")))))
+	(with-current-buffer
+	    buffer-name
+	  (insert name)
+	  (newline 2)
+	  (insert (rubygems-gem-descriptor 'info gem-candidate))
+	  (newline 2)
+	  (insert "Click to copy to kill ring: ")
+	  (insert-button (rubygems-format-for-gemfile gem-candidate)
+			 'action (lambda (button)
+				   (rubygems-candidate-kill-new gem-candidate))
+			 'follow-link t
+			 'point (point)
+			 'buffer (current-buffer))
+	  (newline 2)
+	  (cl-loop for link-pair in
+		   '(("Project Page" . project_uri)
+		     ("Homepage" . homepage_uri)
+		     ("Source Code" . source_code_uri))
+		   do
+		   (let ((uri (rubygems-gem-descriptor (cdr link-pair) gem-candidate)))
+		     (if uri
+			 (progn
+			   (insert-button (car link-pair)
+					  'action (lambda (button)
+						    (helm-browse-url uri))
+					  'follow-link t
+					  'point (point)
+					  'buffer (current-buffer))
+			   (insert "  ")))))
+	  (setq buffer-read-only t))
 	(switch-to-buffer buffer-name)))))
 
 (defun rubygems-search (search-term)
