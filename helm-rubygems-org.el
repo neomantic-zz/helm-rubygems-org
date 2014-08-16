@@ -42,7 +42,7 @@
   :group 'helm-rubygems-org
   :type 'string)
 
-(defun helm-rubygems-gem-description (gem-candidate)
+(defun rubygems-gem-description (gem-candidate)
   "Given a deserialized JSON gem representation, show a description of the gem in a new buffer"
   (let* ((name (rubygems-gem-descriptor 'name gem-candidate))
 		 (buffer-name
@@ -149,7 +149,7 @@
     (action . (("Copy gemfile require" . rubygems-candidate-kill-new)
 	       ("Browse source code project" . rubygems-candidate-browse-source-code)
 	       ("Browse on rubygems.org" . rubygems-candidate-browse)
-	       ("View Description" . helm-rubygems-gem-description)))))
+	       ("View Description" . rubygems-gem-description)))))
 
 (defun helm-rubygems-org ()
   "List Rubygems"
