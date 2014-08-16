@@ -1,3 +1,1 @@
 * Add Package-Requiries
-* Add Pagination
-* getrid of setq
