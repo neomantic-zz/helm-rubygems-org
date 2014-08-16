@@ -40,6 +40,44 @@
   :group 'helm-rubygems-org
   :type 'string)
 
+(defun helm-rubygems-gem-description (gem-candidate)
+  "Given a deserialized JSON gem representation, show a description of the gem in a new buffer"
+  (lexical-let* ((name (rubygems-gem-descriptor 'name gem-candidate))
+		 (buffer-name
+		  (format "*rubygems.org: %s*" name)))
+    (if (get-buffer buffer-name)
+	(switch-to-buffer buffer-name)
+      (progn
+       	(generate-new-buffer buffer-name)
+	(set-buffer buffer-name)
+	(insert name)
+	(newline 2)
+	(insert (rubygems-gem-descriptor 'info gem-candidate))
+	(newline 2)
+	(insert "Click to copy to kill ring: ")
+	(insert-button (rubygems-format-for-gemfile gem-candidate)
+		       'action (lambda (button)
+				 (rubygems-candidate-kill-new gem-candidate))
+		       'follow-link t
+		       'point (point)
+		       'buffer (current-buffer))
+	(newline 2)
+	(cl-loop for link-pair in
+	     '(("Project Page" . project_uri)
+	       ("Homepage" . homepage_uri)
+	       ("Source Code" . source_code_uri))
+	     do
+	     (lexical-let ((uri (rubygems-gem-descriptor (cdr link-pair) gem-candidate)))
+	       (if uri
+		   (progn
+		     (insert-button (car link-pair)
+				    'action (lambda (button)
+					      (helm-browse-url uri))
+				    'follow-link t
+				    'point (point)
+				    'buffer (current-buffer))
+		     (insert "  ")))))
+	(switch-to-buffer buffer-name)))))
 (defun rubygems-search (search-term)
   "Given the string SEARCH-TERM, returns a parsed JSON list of results"
   (cl-flet ((get-page (page-number)
@@ -66,11 +104,15 @@
 	(cdr descriptor-cell)
       nil)))
 
+(defun rubygems-format-for-gemfile (gem-candidate)
+  "Returns a string suitable for inclusion in a Gemfile; gem '<gem name>', '~> <version>"
+  (format "gem '%s', '~> %s'"
+	  (rubygems-gem-descriptor 'name gem-candidate)
+	  (rubygems-gem-descriptor 'version gem-candidate)))
+
 (defun rubygems-candidate-kill-new (gem-candidate)
   "Populates the kill-ring with a string suitable for including an a Gemfile"
-  (kill-new (format "gem '%s', '~> %s'"
-		    (rubygems-gem-descriptor 'name gem-candidate)
-		    (rubygems-gem-descriptor 'verson gem-candidate))))
+  (kill-new (rubygems-format-for-gemfile gem-candidate)))
 
 (defun rubygems-candidate-browse (gem-candidate)
   "Opens a browser to project_uri of the GEM-CANDIDATE"
@@ -101,7 +143,8 @@
     (requires-pattern . 2)
     (action . (("Copy gemfile require" . rubygems-candidate-kill-new)
 	       ("Browse source code project" . rubygems-candidate-browse-source-code)
-	       ("Browse on rubygems.org" . rubygems-candidate-browse)))))
+	       ("Browse on rubygems.org" . rubygems-candidate-browse)
+	       ("View Description" . helm-rubygems-gem-description)))))
 
 (defun helm-rubygems-org ()
   "List Rubygems"
