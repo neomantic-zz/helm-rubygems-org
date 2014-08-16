@@ -78,6 +78,7 @@
 				    'buffer (current-buffer))
 		     (insert "  ")))))
 	(switch-to-buffer buffer-name)))))
+
 (defun rubygems-search (search-term)
   "Given the string SEARCH-TERM, returns a parsed JSON list of results"
   (cl-flet ((get-page (page-number)
