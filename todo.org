@@ -1,1 +1,2 @@
 * Add Package-Requiries
+* use the setFunction for the defcustom option
