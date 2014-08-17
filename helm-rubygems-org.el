@@ -56,6 +56,7 @@
 	  (insert name)
 	  (newline 2)
 	  (insert (rubygems-gem-descriptor 'info gem-candidate))
+	  (fill-paragraph)
 	  (newline 2)
 	  (insert "Click to copy to kill ring: ")
 	  (insert-button (rubygems-format-for-gemfile gem-candidate)
