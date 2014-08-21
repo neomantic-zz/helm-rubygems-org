@@ -121,7 +121,9 @@
 
 (defun helm-rubygems-candidate-to-kill-ring (gem-candidate)
   "Populates the kill-ring with a string suitable for including an a Gemfile"
-  (kill-new (helm-rubygems-gemfile-format gem-candidate)))
+  (let ((formatted (helm-rubygems-gemfile-format gem-candidate)))
+	(kill-new formatted)
+	(message formatted)))
 
 (defun helm-rubygems-candidate-browse-to-project (gem-candidate)
   "Opens a browser to project_uri of the GEM-CANDIDATE"
