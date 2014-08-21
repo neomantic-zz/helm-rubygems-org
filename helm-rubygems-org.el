@@ -8,7 +8,7 @@
 ;; URL: https://github.com/neomantic/helm-rubygems
 ;; Version: 0.0.1
 ;; Keywords: ruby, rubygems, gemfile
-;; Package-Requires: ()
+;; Package-Requires: ((helm "20140705.320"))
 
 ;; This file is NOT part of GNU Emacs.
 
@@ -34,6 +34,41 @@
 (require 'url)
 (require 'cl-lib)
 
+(defun helm-rubygems-api-key-set (symbol value)
+  "Sets the helm-ruby-gems-api-key based on the VALUE which can be t (for the credentials file), a file name, or the key itself"
+  (cond
+   ;; if it has the charateristics of an API, assume it is
+   ((and (char-or-string-p value)
+	 (eq (length value) 32)
+	 (eq (string-match "[a-z1-9]+" value) 0))
+    (set-default symbol value))
+   ((eq value t)
+    (let ((file-name "~/.gem/credentials"))
+      (if (and (file-exists-p   file-name)
+	       (file-readable-p file-name))
+	  (set-default symbol
+		(with-temp-buffer
+		  (insert-file-contents file-name)
+		  (forward-line)
+		  (let ((data-line (buffer-string)))
+		    (if (eq (string-match ":rubygems_api_key: \\([a-z1-9]+\\)" data-line) nil)
+			(error "unable to detect API key in %s" file-name)
+		      (match-string 1 data-line)))))
+	(error "The file %s either does not exist on is not readable" file-name))))
+   ((and (char-or-string-p value)
+	  (eq (length value) 0))
+    (error "Missing rubygems API key; please customize group helm-rubygems-org"))
+   ((file-exists-p value)
+     (progn
+       (if (not (file-readable-p value))
+	   (error "Unable to read '%'" value)
+	 (set-default symbol
+		      (with-temp-buffer
+			(insert-file-contents value)
+			(buffer-string))))))
+   (t
+    (set-default symbol value))))
+
 (defgroup helm-rubygems-org nil
   "Customizations for search online for rubygems"
   :group 'helm)
@@ -42,8 +77,9 @@
   "The API Key issued by rubygems.org, required to its use API"
   :group 'helm-rubygems-org
   :type '(choice (string :tag "API Key")
-		 (boolean t :tag "Rubygems.org credential file: ~/.gem/credentials")
-		 (file :must-match t :tag "Plain file with API key")))
+		 (boolean :tag "Rubygems.org credential file: ~/.gem/credentials" t)
+		 (file :must-match t :tag "Plain file with API key"))
+  :set 'helm-rubygems-api-key-set)
 
 (defun rubygems-gem-description (gem-candidate)
   "Given a deserialized JSON gem representation, show a description of the gem in a new buffer"
@@ -87,41 +123,13 @@
 	  (setq buffer-read-only t))
 	(switch-to-buffer buffer-name)))))
 
-(defun helm-rubygems-api-key-set ()
-  "Sets the helm-ruby-gems-api-key based on the help-rubygems-api-key customization"
-  (cond
-   ((eq helm-rubygems-api-key t)
-    (let ((file-name "~/.gem/credentials"))
-      (if (and (file-exists-p   file-name)
-	       (file-readable-p file-name))
-	  (setq helm-rubygems-api-key
-		(with-temp-buffer
-		  (insert-file-contents file-name)
-		  (forward-line)
-		  (let ((data-line (buffer-string)))
-		    (if (eq (string-match ":rubygems_api_key: \\([a-z1-9]+\\)" data-line) nil)
-			(error "unable to detect API key in %s" file-name)
-		      (match-string 1 data-line)))))
-	(error "The file %s either does not exist on is not readable" file-name))))
-   ((and (char-or-string-p helm-rubygems-api-key)
-	  (eq (length helm-rubygems-api-key) 0))
-    (error "Missing rubygems API key; please customize group helm-rubygems-org"))
-   ((file-exists-p helm-rubygems-api-key)
-     (progn
-       (if (not (file-readable-p helm-rubygems-api-key))
-	   (error "Unable to read '%'" helm-rubygems-api-key)
-	 (setq helm-rubygems-api-key
-	       (with-temp-buffer
-		 (insert-file-contents helm-rubygems-api-key)
-		 (buffer-string))))))))
-
-(defun rubygems-search (search-term)
-  "Given the string SEARCH-TERM, returns a parsed JSON list of results"
+(defun rubygems-search (search-term api-key)
+  "Given the string SEARCH-TERM and the API-KEY, returns a parsed JSON list of results"
   (cl-flet ((get-page (page-number)
 		      (with-current-buffer
 			  (let ((url-mime-accept-string  "application/json")
 				(url-request-extra-headers
-				 (list (cons "Authorization" helm-rubygems-key-set))))
+				 (list (cons "Authorization" api-key))))
 			    (url-retrieve-synchronously
 			     (concat "https://rubygems.org/api/v1/"
 				     (format "search?query=%s&page=%d" (url-hexify-string search-term) page-number))))
@@ -170,7 +178,10 @@
 			  (rubygems-gem-descriptor 'name gem-candidate)
 			  (rubygems-gem-descriptor 'version gem-candidate))
 		  gem-candidate))
-	  (rubygems-search helm-pattern)))
+	  (rubygems-search helm-pattern
+			   (helm-rubygems-api-key-set
+			    'helm-rubygems-api-key
+			    helm-rubygems-api-key))))
 
 (defvar helm-source-rubygems-search
   '((name . "Rubygems.org")
