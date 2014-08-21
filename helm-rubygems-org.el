@@ -55,7 +55,8 @@
        	(generate-new-buffer buffer-name)
 		(with-current-buffer
 			buffer-name
-		  (insert name)
+		  (insert (format "%s %s" name
+						  (rubygems.org-gem-descriptor 'version gem-candidate)))
 		  (newline 2)
 		  (insert (rubygems.org-gem-descriptor 'info gem-candidate))
 		  (fill-paragraph)
