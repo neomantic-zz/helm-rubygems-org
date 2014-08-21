@@ -7,7 +7,7 @@
 ;; Author: Chad Albers <calbers@neomantic.com>
 ;; URL: https://github.com/neomantic/helm-rubygems
 ;; Version: 0.0.1
-;; Keywords: ruby, rubygems, gemfile
+;; Keywords: ruby, rubygems, gemfile, helm
 ;; Package-Requires: ((helm "20140705.320"))
 
 ;; This file is NOT part of GNU Emacs.
