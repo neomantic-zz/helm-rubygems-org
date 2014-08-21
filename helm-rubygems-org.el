@@ -38,55 +38,55 @@
   "Customizations for search online for rubygems"
   :group 'helm)
 
-(defcustom helm-rubygems-api-key "~/.gem/credentials"
+(defcustom helm-rubygems-org-api-key "~/.gem/credentials"
   "The API Key file or key value issued by rubygems.org"
   :group 'helm-rubygems-org
   :type '(choice (file   :tag "Rubygems.org credential file: ~/.gem/credentials")
 		 (string :tag "API Key")))
 
-(defun rubygems-gem-description (gem-candidate)
+(defun helm-rubygems-org-gem-description-view (gem-candidate)
   "Given a deserialized JSON gem representation, show a description of the gem in a new buffer"
-  (let* ((name (rubygems-gem-descriptor 'name gem-candidate))
+  (let* ((name (rubygems.org-gem-descriptor 'name gem-candidate))
 		 (buffer-name
 		  (format "*rubygems.org: %s*" name)))
     (if (get-buffer buffer-name)
-	(switch-to-buffer buffer-name)
-      (progn
+		(switch-to-buffer buffer-name)
+	  (progn
        	(generate-new-buffer buffer-name)
-	(with-current-buffer
-	    buffer-name
-	  (insert name)
-	  (newline 2)
-	  (insert (rubygems-gem-descriptor 'info gem-candidate))
-	  (fill-paragraph)
-	  (newline 2)
-	  (insert "Click to copy to kill ring: ")
-	  (insert-button (rubygems-format-for-gemfile gem-candidate)
-			 'action (lambda (button)
-				   (rubygems-candidate-kill-new gem-candidate))
-			 'follow-link t
-			 'point (point)
-			 'buffer (current-buffer))
-	  (newline 2)
-	  (cl-loop for link-pair in
-		   '(("Project Page" . project_uri)
-		     ("Homepage" . homepage_uri)
-		     ("Source Code" . source_code_uri))
-		   do
-		   (let ((uri (rubygems-gem-descriptor (cdr link-pair) gem-candidate)))
-		     (if uri
-			 (progn
-			   (insert-button (car link-pair)
-					  'action (lambda (button)
-						    (helm-browse-url uri))
-					  'follow-link t
-					  'point (point)
-					  'buffer (current-buffer))
-			   (insert "  ")))))
-	  (setq buffer-read-only t))
-	(switch-to-buffer buffer-name)))))
+		(with-current-buffer
+			buffer-name
+		  (insert name)
+		  (newline 2)
+		  (insert (rubygems.org-gem-descriptor 'info gem-candidate))
+		  (fill-paragraph)
+		  (newline 2)
+		  (insert "Click to copy to kill ring: ")
+		  (insert-button (helm-rubygems-gemfile-format gem-candidate)
+						 'action (lambda (button)
+								   (helm-rubygems-candidate-to-kill-ring gem-candidate))
+						 'follow-link t
+						 'point (point)
+						 'buffer (current-buffer))
+		  (newline 2)
+		  (cl-loop for link-pair in
+				   '(("Project Page" . project_uri)
+					 ("Homepage" . homepage_uri)
+					 ("Source Code" . source_code_uri))
+				   do
+				   (let ((uri (rubygems.org-gem-descriptor (cdr link-pair) gem-candidate)))
+					 (if uri
+						 (progn
+						   (insert-button (car link-pair)
+										  'action (lambda (button)
+													(helm-browse-url uri))
+										  'follow-link t
+										  'point (point)
+										  'buffer (current-buffer))
+						   (insert "  ")))))
+		  (setq buffer-read-only t))
+		(switch-to-buffer buffer-name)))))
 
-(defun rubygems-search (search-term api-key)
+(defun rubygems.org-search (search-term api-key)
   "Given the string SEARCH-TERM and the API-KEY, returns a parsed JSON list of results"
   (cl-flet ((get-page (page-number)
 		      (with-current-buffer
@@ -95,7 +95,8 @@
 				 (list (cons "Authorization" api-key))))
 			    (url-retrieve-synchronously
 			     (concat "https://rubygems.org/api/v1/"
-				     (format "search?query=%s&page=%d" (url-hexify-string search-term) page-number))))
+				     (format "search?query=%s&page=%d"
+							 (url-hexify-string search-term) page-number))))
 			(goto-char (+ 1 url-http-end-of-headers))
 			(json-read))))
     (cl-loop for page-number from 1 to 3
@@ -105,36 +106,37 @@
 			      candidate)
 			    candidates))))
 
-(defun rubygems-gem-descriptor (descriptor gem-candidate)
+(defun rubygems.org-gem-descriptor (descriptor gem-candidate)
   "Returns the value descriptor by the DESCRIPTOR symbol for GEM-CANDIDATE parsed rubygems resource representation"
   (let ((descriptor-cell (assoc descriptor gem-candidate)))
     (if descriptor-cell
-	(cdr descriptor-cell)
+		(cdr descriptor-cell)
       nil)))
 
-(defun rubygems-format-for-gemfile (gem-candidate)
+(defun helm-rubygems-gemfile-format (gem-candidate)
   "Returns a string suitable for inclusion in a Gemfile; gem '<gem name>', '~> <version>"
   (format "gem '%s', '~> %s'"
-	  (rubygems-gem-descriptor 'name gem-candidate)
-	  (rubygems-gem-descriptor 'version gem-candidate)))
+		  (rubygems.org-gem-descriptor 'name gem-candidate)
+		  (rubygems.org-gem-descriptor 'version gem-candidate)))
 
-(defun rubygems-candidate-kill-new (gem-candidate)
+(defun helm-rubygems-candidate-to-kill-ring (gem-candidate)
   "Populates the kill-ring with a string suitable for including an a Gemfile"
-  (kill-new (rubygems-format-for-gemfile gem-candidate)))
+  (kill-new (helm-rubygems-gemfile-format gem-candidate)))
 
-(defun rubygems-candidate-browse (gem-candidate)
+(defun helm-rubygems-candidate-browse-to-project (gem-candidate)
   "Opens a browser to project_uri of the GEM-CANDIDATE"
   (helm-browse-url
-   (rubygems-gem-descriptor 'project_uri gem-candidate)))
+   (rubygems.org-gem-descriptor 'project_uri gem-candidate)))
 
-(defun rubygems-candidate-browse-source-code (gem-candidate)
+(defun helm-rubygems-candidate-browse-to-source (gem-candidate)
   "Opens a browser to source_code_uri of then GEM-CANDIDATE"
-  (let ((source-code-uri (rubygems-gem-descriptor 'source_code_uri gem-candidate)))
+  (let ((source-code-uri (rubygems.org-gem-descriptor
+						  'source_code_uri gem-candidate)))
     (if source-code-uri
-	(helm-browse-url source-code-uri)
-      (rubygems-candidate-browse gem-candidate))))
+		(helm-browse-url source-code-uri)
+      (helm-rubygems-candidate-browse-to-project gem-candidate))))
 
-(defun rubygems-api-key-derive (key-or-file)
+(defun helm-rubygems-api-key-derive (key-or-file)
   "PASS a string or a path to the rubygems.org YAML credentials fil, returns API key used to authenticate request"
   (cond
    ((eq key-or-file nil)
@@ -150,8 +152,8 @@
 			  (match-string 1 data-line))))
       (error "The file %s is not readable" key-or-file)))
    ((and (char-or-string-p key-or-file) ;; if it looks like an API key
-	 (eq (length key-or-file) 32)
-	 (eq (string-match "[a-z1-9]+" key-or-file) 0))
+		 (eq (length key-or-file) 32)
+		 (eq (string-match "[a-z1-9]+" key-or-file) 0))
     key-or-file)
    (t
     (error "Missing rubygems API key; please customize group helm-rubygems-org"))))
@@ -159,27 +161,28 @@
 (defun helm-rubygems-org-search ()
   "Returns a list of gem candidates suitable for helm"
   (mapcar (lambda (gem-candidate)
-	    (cons (format "%s ~> %s"
-			  (rubygems-gem-descriptor 'name gem-candidate)
-			  (rubygems-gem-descriptor 'version gem-candidate))
-		  gem-candidate))
-	  (rubygems-search helm-pattern
-			   (rubygems-api-key-derive helm-rubygems-api-key))))
+			(cons (format "%s ~> %s"
+						  (rubygems.org-gem-descriptor 'name gem-candidate)
+						  (rubygems.org-gem-descriptor 'version gem-candidate))
+				  gem-candidate))
+		  (rubygems.org-search
+		   helm-pattern
+		   (helm-rubygems-api-key-derive helm-rubygems-org-api-key))))
 
-(defvar helm-source-rubygems-search
+(defvar helm-rubygems-org-search-source
   '((name . "Rubygems.org")
     (candidates . helm-rubygems-org-search)
     (volatile)
     (delayed)
     (requires-pattern . 2)
-    (action . (("Copy gemfile require" .       rubygems-candidate-kill-new)
-			   ("Browse source code project" . rubygems-candidate-browse-source-code)
-			   ("Browse on rubygems.org" .     rubygems-candidate-browse)
-			   ("View Description" .           rubygems-gem-description)))))
+    (action . (("Copy gemfile require" .       helm-rubygems-candidate-to-kill-ring)
+			   ("Browse source code project" . helm-rubygems-candidate-browse-to-source)
+			   ("Browse on rubygems.org" .     helm-rubygems-candidate-browse-to-project)
+			   ("View Description" .           helm-rubygems-org-gem-description-view)))))
 
 (defun helm-rubygems-org ()
   "List Rubygems"
   (interactive)
-  (helm :sources 'helm-source-rubygems-search :buffer "*helm-rubygems*"))
+  (helm :sources 'helm-rubygems-org-search-source :buffer "*helm-rubygems*"))
 
 (provide 'helm-rubygems-org)
