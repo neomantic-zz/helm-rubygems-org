@@ -34,52 +34,15 @@
 (require 'url)
 (require 'cl-lib)
 
-(defun helm-rubygems-api-key-set (symbol value)
-  "Sets the helm-ruby-gems-api-key based on the VALUE which can be t (for the credentials file), a file name, or the key itself"
-  (cond
-   ;; if it has the charateristics of an API, assume it is
-   ((and (char-or-string-p value)
-	 (eq (length value) 32)
-	 (eq (string-match "[a-z1-9]+" value) 0))
-    (set-default symbol value))
-   ((eq value t)
-    (let ((file-name "~/.gem/credentials"))
-      (if (and (file-exists-p   file-name)
-	       (file-readable-p file-name))
-	  (set-default symbol
-		(with-temp-buffer
-		  (insert-file-contents file-name)
-		  (forward-line)
-		  (let ((data-line (buffer-string)))
-		    (if (eq (string-match ":rubygems_api_key: \\([a-z1-9]+\\)" data-line) nil)
-			(error "unable to detect API key in %s" file-name)
-		      (match-string 1 data-line)))))
-	(error "The file %s either does not exist on is not readable" file-name))))
-   ((and (char-or-string-p value)
-	  (eq (length value) 0))
-    (error "Missing rubygems API key; please customize group helm-rubygems-org"))
-   ((file-exists-p value)
-     (progn
-       (if (not (file-readable-p value))
-	   (error "Unable to read '%'" value)
-	 (set-default symbol
-		      (with-temp-buffer
-			(insert-file-contents value)
-			(buffer-string))))))
-   (t
-    (set-default symbol value))))
-
 (defgroup helm-rubygems-org nil
   "Customizations for search online for rubygems"
   :group 'helm)
 
-(defcustom helm-rubygems-api-key ""
-  "The API Key issued by rubygems.org, required to its use API"
+(defcustom helm-rubygems-api-key "~/.gem/credentials"
+  "The API Key file or key value issued by rubygems.org"
   :group 'helm-rubygems-org
-  :type '(choice (string :tag "API Key")
-		 (boolean :tag "Rubygems.org credential file: ~/.gem/credentials" t)
-		 (file :must-match t :tag "Plain file with API key"))
-  :set 'helm-rubygems-api-key-set)
+  :type '(choice (file   :tag "Rubygems.org credential file: ~/.gem/credentials")
+		 (string :tag "API Key")))
 
 (defun rubygems-gem-description (gem-candidate)
   "Given a deserialized JSON gem representation, show a description of the gem in a new buffer"
@@ -171,7 +134,29 @@
 	(helm-browse-url source-code-uri)
       (rubygems-candidate-browse gem-candidate))))
 
-(defun helm-rubygems-search ()
+(defun rubygems-api-key-derive (key-or-file)
+  "PASS a string or a path to the rubygems.org YAML credentials fil, returns API key used to authenticate request"
+  (cond
+   ((eq key-or-file nil)
+    (error "Missing rubygems API key; please customize group helm-rubygems-org"))
+   ((file-exists-p key-or-file)
+    (if (file-readable-p key-or-file)
+		(with-temp-buffer
+		  (insert-file-contents key-or-file)
+		  (forward-line)
+		  (let ((data-line (buffer-string)))
+			(if (eq (string-match ":rubygems_api_key: \\([a-z1-9]+\\)" data-line) nil)
+				(error "unable to detect API key in %s" key-or-file)
+			  (match-string 1 data-line))))
+      (error "The file %s is not readable" key-or-file)))
+   ((and (char-or-string-p key-or-file) ;; if it looks like an API key
+	 (eq (length key-or-file) 32)
+	 (eq (string-match "[a-z1-9]+" key-or-file) 0))
+    key-or-file)
+   (t
+    (error "Missing rubygems API key; please customize group helm-rubygems-org"))))
+
+(defun helm-rubygems-org-search ()
   "Returns a list of gem candidates suitable for helm"
   (mapcar (lambda (gem-candidate)
 	    (cons (format "%s ~> %s"
@@ -179,20 +164,18 @@
 			  (rubygems-gem-descriptor 'version gem-candidate))
 		  gem-candidate))
 	  (rubygems-search helm-pattern
-			   (helm-rubygems-api-key-set
-			    'helm-rubygems-api-key
-			    helm-rubygems-api-key))))
+			   (rubygems-api-key-derive helm-rubygems-api-key))))
 
 (defvar helm-source-rubygems-search
   '((name . "Rubygems.org")
-    (candidates . helm-rubygems-search)
+    (candidates . helm-rubygems-org-search)
     (volatile)
     (delayed)
     (requires-pattern . 2)
-    (action . (("Copy gemfile require" . rubygems-candidate-kill-new)
-	       ("Browse source code project" . rubygems-candidate-browse-source-code)
-	       ("Browse on rubygems.org" . rubygems-candidate-browse)
-	       ("View Description" . rubygems-gem-description)))))
+    (action . (("Copy gemfile require" .       rubygems-candidate-kill-new)
+			   ("Browse source code project" . rubygems-candidate-browse-source-code)
+			   ("Browse on rubygems.org" .     rubygems-candidate-browse)
+			   ("View Description" .           rubygems-gem-description)))))
 
 (defun helm-rubygems-org ()
   "List Rubygems"
