@@ -1,4 +1,4 @@
-;;; helm-rubygems-org.el --- -*- lexical-binding: t -*-
+;;; helm-rubygems-org.el --- Use helm to search rubygems.org -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2014 Chad Albers
 
