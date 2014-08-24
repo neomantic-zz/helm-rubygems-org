@@ -5,7 +5,7 @@
 ;; Copyright (C) 2014 Chad Albers
 
 ;; Author: Chad Albers <calbers@neomantic.com>
-;; URL: https://github.com/neomantic/helm-rubygems
+;; URL: https://github.com/neomantic/helm-rubygems-org
 ;; Version: 0.0.1
 ;; Keywords: ruby, rubygems, gemfile, helm
 ;; Package-Requires: ((helm "20140705.320"))
@@ -29,6 +29,20 @@
 ;; Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
 ;; Boston, MA 02110-1301, USA.
 
+;;; Commentary
+;; A helm interface to rubygems.org
+;;
+;; Requirements: a rubygems account and it's API key.
+;;
+;; Setup:
+;; a) Store the rubygems.org API key in its recommended YAML file
+;; at ~.gem/credentials, or b) add the key to the helm-rubygems-org
+;; customization ground, or c) (setq helm-rubygems-org-api-key to
+;; the key or file
+;;
+;; Usage:
+;; M-x helm-rubygems-org, and then type gem name
+;;
 ;;; Code:
 
 (require 'helm)
