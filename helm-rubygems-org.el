@@ -43,6 +43,9 @@
 ;; Usage:
 ;; M-x helm-rubygems-org, and then type gem name
 ;;
+;; Detailed documentation can be found here:
+;; https://github.com/neomantic/helm-rubygems-org
+;;
 ;;; Code:
 
 (require 'helm)
@@ -188,6 +191,7 @@
 	   helm-pattern
 	   (helm-rubygems-org-api-key-derive helm-rubygems-org-api-key))))
 
+;;;###autoload
 (defvar helm-rubygems-org-search-source
   '((name . "Rubygems.org")
     (candidates . helm-rubygems-org-search)
@@ -199,6 +203,7 @@
 	       ("Browse source code project" . helm-rubygems-org-candidate-browse-to-source)
 	       ("Browse on rubygems.org" .     helm-rubygems-org-candidate-browse-to-project)))))
 
+;;;###autoload
 (defun helm-rubygems-org ()
   "List Rubygems"
   (interactive)
