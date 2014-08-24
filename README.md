@@ -48,7 +48,7 @@ provide a mechanism to indicate to the user the progress of this connection.
 Consequently, `helm-rubygems-org.el` appears to be doing nothing, when it actually
 is. *Please be patient*, and a list of gems is bound to appear.
 
-## Screenshot
+## Screenshots
 
 ![Screenshot](screenshot.png?raw=true "Screenshot")
 ![Screenshot 1](screenshot1.png?raw=true "Screenshot Description")
