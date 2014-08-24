@@ -51,6 +51,7 @@ is. *Please be patient*, and a list of gems is bound to appear.
 ## Screenshot
 
 ![Screenshot](screenshot.png?raw=true "Screenshot")
+![Screenshot 1](screenshot1.png?raw=true "Screenshot Description")
 
 ## License
 
