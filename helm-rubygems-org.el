@@ -180,7 +180,7 @@
     (volatile)
     (delayed)
     (requires-pattern . 2)
-    (action . (("Copy gemfile require" .       helm-rubygems-org-candidate-to-kill-ring)
+    (action . (("Copy Gemfile require" .       helm-rubygems-org-candidate-to-kill-ring)
 	       ("View Description" .           helm-rubygems-org-candidate-view)
 	       ("Browse source code project" . helm-rubygems-org-candidate-browse-to-source)
 	       ("Browse on rubygems.org" .     helm-rubygems-org-candidate-browse-to-project)))))
