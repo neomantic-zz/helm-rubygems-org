@@ -62,7 +62,7 @@
 
 (defun helm-rubygems-org-candidate-view (gem-candidate)
   "Given a deserialized JSON gem representation GEM-CANDIDATE, show a description of the gem in a new buffer"
-  (let* ((name (rubygems.org-gem-descriptor 'name gem-candidate))
+  (let* ((name (rubygems-org-gem-descriptor 'name gem-candidate))
 	 (buffer-name
 	  (format "*rubygems.org: %s*" name)))
     (if (get-buffer buffer-name)
@@ -72,13 +72,13 @@
 	(with-current-buffer
 	    buffer-name
 	  (insert (format "%s %s" name
-			  (rubygems.org-gem-descriptor 'version gem-candidate)))
+			  (rubygems-org-gem-descriptor 'version gem-candidate)))
 	  (newline 2)
-	  (insert (rubygems.org-gem-descriptor 'info gem-candidate))
+	  (insert (rubygems-org-gem-descriptor 'info gem-candidate))
 	  (fill-paragraph)
 	  (newline 2)
 	  (insert "Click to copy to kill ring: ")
-	  (insert-button (rubygems.org-candidate-gemfile-format gem-candidate)
+	  (insert-button (rubygems-org-candidate-gemfile-format gem-candidate)
 			 'action (lambda (button)
 				   (helm-rubygems-candidate-to-kill-ring gem-candidate))
 			 'follow-link t
@@ -90,7 +90,7 @@
 		     ("Homepage" . homepage_uri)
 		     ("Source Code" . source_code_uri))
 		   do
-		   (let ((uri (rubygems.org-gem-descriptor (cdr link-pair) gem-candidate)))
+		   (let ((uri (rubygems-org-gem-descriptor (cdr link-pair) gem-candidate)))
 		     (if uri
 			 (progn
 			   (insert-button (car link-pair)
@@ -103,7 +103,7 @@
 	  (setq buffer-read-only t))
 	(switch-to-buffer buffer-name)))))
 
-(defun rubygems.org-search (search-term api-key)
+(defun rubygems-org-search (search-term api-key)
   "Given the string SEARCH-TERM and the API-KEY, returns a parsed JSON list of results"
   (cl-flet ((get-page (page-number)
 		      (with-current-buffer
@@ -123,33 +123,33 @@
 			      candidate)
 			    candidates))))
 
-(defun rubygems.org-gem-descriptor (descriptor gem-candidate)
+(defun rubygems-org-gem-descriptor (descriptor gem-candidate)
   "Returns the value descriptor by the DESCRIPTOR symbol for parsed rubygems.org resource representation GEM-CANDIDATE"
   (let ((descriptor-cell (assoc descriptor gem-candidate)))
     (if descriptor-cell
 	(cdr descriptor-cell)
       nil)))
 
-(defun rubygems.org-candidate-gemfile-format (gem-candidate)
+(defun rubygems-org-candidate-gemfile-format (gem-candidate)
   "Given a GEM-CANDIDATE (deserialized JSON representation), returns a string suitable for inclusion in a Gemfile; gem '<gem name>', '~> <version>'"
   (format "gem '%s', '~> %s'"
-	  (rubygems.org-gem-descriptor 'name gem-candidate)
-	  (rubygems.org-gem-descriptor 'version gem-candidate)))
+	  (rubygems-org-gem-descriptor 'name gem-candidate)
+	  (rubygems-org-gem-descriptor 'version gem-candidate)))
 
 (defun helm-rubygems-org-candidate-to-kill-ring (gem-candidate)
   "Given a GEM-CANDIDATE (deserialized JSON representation), populates the kill-ring with a string suitable for including an a Gemfile"
-  (let ((formatted (rubygems.org-candidate-gemfile-format gem-candidate)))
+  (let ((formatted (rubygems-org-candidate-gemfile-format gem-candidate)))
     (kill-new formatted)
     (message formatted)))
 
 (defun helm-rubygems-org-candidate-browse-to-project (gem-candidate)
   "Opens a browser to project_uri of the GEM-CANDIDATE"
   (helm-browse-url
-   (rubygems.org-gem-descriptor 'project_uri gem-candidate)))
+   (rubygems-org-gem-descriptor 'project_uri gem-candidate)))
 
 (defun helm-rubygems-org-candidate-browse-to-source (gem-candidate)
   "Opens a browser to source_code_uri of then GEM-CANDIDATE"
-  (let ((source-code-uri (rubygems.org-gem-descriptor
+  (let ((source-code-uri (rubygems-org-gem-descriptor
 			  'source_code_uri gem-candidate)))
     (if source-code-uri
 	(helm-browse-url source-code-uri)
@@ -181,10 +181,10 @@
   "Returns a list of gem candidates suitable for helm"
   (mapcar (lambda (gem-candidate)
 	    (cons (format "%s ~> %s"
-			  (rubygems.org-gem-descriptor 'name gem-candidate)
-			  (rubygems.org-gem-descriptor 'version gem-candidate))
+			  (rubygems-org-gem-descriptor 'name gem-candidate)
+			  (rubygems-org-gem-descriptor 'version gem-candidate))
 		  gem-candidate))
-	  (rubygems.org-search
+	  (rubygems-org-search
 	   helm-pattern
 	   (helm-rubygems-org-api-key-derive helm-rubygems-org-api-key))))
 
