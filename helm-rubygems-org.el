@@ -181,9 +181,9 @@
     (delayed)
     (requires-pattern . 2)
     (action . (("Copy gemfile require" .       helm-rubygems-org-candidate-to-kill-ring)
+	       ("View Description" .           helm-rubygems-org-candidate-view)
 	       ("Browse source code project" . helm-rubygems-org-candidate-browse-to-source)
-	       ("Browse on rubygems.org" .     helm-rubygems-org-candidate-browse-to-project)
-	       ("View Description" .           helm-rubygems-org-candidate-view)))))
+	       ("Browse on rubygems.org" .     helm-rubygems-org-candidate-browse-to-project)))))
 
 (defun helm-rubygems-org ()
   "List Rubygems"
