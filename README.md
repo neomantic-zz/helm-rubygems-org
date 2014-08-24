@@ -11,7 +11,7 @@ A Helm interface to query [rubygems.org](http://rubygems.org)
 ## Setup
 
 For this helm interface to connect to rubygems.org, API requests must be
-authorized using an API key. There are 3 ways to provide this API to
+authorized using an API key. There are 3 ways to provide this key to
 `helm-rubygems-org.el`.
 
 1.  If you have chosen to store your API key in the `~.gem/credentials` YAML file,
@@ -21,7 +21,7 @@ authorized using an API key. There are 3 ways to provide this API to
 interface.
 
 3. Using `setq`, bind the `helm-rubygems-org-api-key` variable to either the value
-of the API key or the credential YAML file where the API key is stored
+of the API key or the credentials YAML file where the API key is stored.
 
 ## Usage
 
@@ -38,8 +38,8 @@ provide a list of helm actions. They are:
 1. "Copy Gemfile require" - copies the name and version of the gem to the kill ring.
 2. "View Description" - open a buffer with a description of the gem.
 3. "Browse source code project" - opens the gem's source code URL in a web browser
-(or if the URL doesn't exist, opens the gem's rubygems.org page)
-4. "Browse on rubygems.org" - opens the gem's rubygems.org page in a web browser
+(or if the URL doesn't exist, opens the gem's rubygems.org page).
+4. "Browse on rubygems.org" - opens the gem's rubygems.org page in a web browser.
 
 **Important Note**
 
