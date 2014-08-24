@@ -33,7 +33,7 @@
 ;; A helm interface to rubygems.org
 ;;
 ;; Requirements:
-;; * [The helm package](https://github.com/emacs-helm/helm)
+;; * The helm package - https://github.com/emacs-helm/helm
 ;; * A rubygems.org account and the account's API key
 ;;
 ;; Setup:
