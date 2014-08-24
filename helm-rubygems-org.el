@@ -93,7 +93,7 @@
 	  (insert "Click to copy to kill ring: ")
 	  (insert-button (rubygems-org-candidate-gemfile-format gem-candidate)
 			 'action (lambda (button)
-				   (helm-rubygems-candidate-to-kill-ring gem-candidate))
+				   (helm-rubygems-org-candidate-to-kill-ring gem-candidate))
 			 'follow-link t
 			 'point (point)
 			 'buffer (current-buffer))
