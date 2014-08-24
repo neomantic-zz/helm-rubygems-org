@@ -1,11 +1,12 @@
 ;;; -*- lexical-binding: t -*-
 
-;; helm-rubygems-org.el ---
-
+;;; helm-rubygems-org.el ---
 ;; Copyright (C) 2014 Chad Albers
 
 ;; Author: Chad Albers <calbers@neomantic.com>
+;; Maintainer: Chad Albers <calbers@neomantic.com>
 ;; URL: https://github.com/neomantic/helm-rubygems-org
+;; Created: 25th August 2014
 ;; Version: 0.0.1
 ;; Keywords: ruby, rubygems, gemfile, helm
 ;; Package-Requires: ((helm "20140705.320"))
