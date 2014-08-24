@@ -14,8 +14,8 @@ For this helm interface to connect to rubygems.org, API requests must be
 authorized using an API key. There are 3 ways to provide this API to
 `helm-rubygems-org.el`.
 
-1.  If you have chosen to store your API key at `~.gem/credentials`,
-`helm-rubygems-org.el` will recognize the key stored in that YAML file.
+1.  If you have chosen to store your API key in the `~.gem/credentials` YAML file,
+`helm-rubygems-org.el` will use it as API key source.
 
 2. `M-x customize-group` => `helm-rubygems-org` will provide a customization
 interface.
@@ -33,22 +33,20 @@ a list of search results should appear in a helm interface.
 By default, hitting the return key on a item in the search results will populate
 the kill ring with a string suitable for inclusion in a `Gemfile`. (e.g.
 `gem 'guard-rackunit', '~> 1.0.0'`). Alternatively, hitting the tab key will
-provide a list of Helm actions.  They are:
+provide a list of helm actions. They are:
 
 1. "Copy Gemfile require" - copies the name and version of the gem to the kill ring.
 2. "View Description" - open a buffer with a description of the gem.
-3. "Browse source code project" - opens a web browser to the location of the gem's
-source code (or if it doesn't exist, opens the gem's rubygems.org page)
-4. "Browse on rubygems.org" - opens a web browser to the rubygems.org page of the
-gem
-
+3. "Browse source code project" - opens the gem's source code URL in a web browser
+(or if the URL doesn't exist, opens the gem's rubygems.org page)
+4. "Browse on rubygems.org" - opens the gem's rubygems.org page in a web browser
 
 **Important Note**
 
-Connecting to rubygems.org takes place through an HTTP connection - which can be
-slow. Helm (or emacs) does not provide a mechanism to indicate to the user the progress
-of this connection. Consequently, `helm-rubygems-org.el` appears to be doing nothing,
-when it actually is. *Please be patient*, and a list of gems is bound to appear.
+API connection's to rubygems.org are often slow. Helm (or emacs) does not
+provide a mechanism to indicate to the user the progress of this connection.
+Consequently, `helm-rubygems-org.el` appears to be doing nothing, when it actually
+is. *Please be patient*, and a list of gems is bound to appear.
 
 ## License
 
