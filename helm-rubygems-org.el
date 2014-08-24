@@ -46,7 +46,7 @@
   :type '(choice (file   :tag "Rubygems.org credential file: ~/.gem/credentials")
 		 (string :tag "API Key")))
 
-(defun helm-rubygems-org-gem-description-view (gem-candidate)
+(defun helm-rubygems-org-candidate-view (gem-candidate)
   "Given a deserialized JSON gem representation, show a description of the gem in a new buffer"
   (let* ((name (rubygems.org-gem-descriptor 'name gem-candidate))
 	 (buffer-name
@@ -64,7 +64,7 @@
 	  (fill-paragraph)
 	  (newline 2)
 	  (insert "Click to copy to kill ring: ")
-	  (insert-button (helm-rubygems-gemfile-format gem-candidate)
+	  (insert-button (rubygems.org-candidate-gemfile-format gem-candidate)
 			 'action (lambda (button)
 				   (helm-rubygems-candidate-to-kill-ring gem-candidate))
 			 'follow-link t
@@ -116,32 +116,32 @@
 	(cdr descriptor-cell)
       nil)))
 
-(defun helm-rubygems-gemfile-format (gem-candidate)
+(defun rubygems.org-candidate-gemfile-format (gem-candidate)
   "Returns a string suitable for inclusion in a Gemfile; gem '<gem name>', '~> <version>"
   (format "gem '%s', '~> %s'"
 	  (rubygems.org-gem-descriptor 'name gem-candidate)
 	  (rubygems.org-gem-descriptor 'version gem-candidate)))
 
-(defun helm-rubygems-candidate-to-kill-ring (gem-candidate)
+(defun helm-rubygems-org-candidate-to-kill-ring (gem-candidate)
   "Populates the kill-ring with a string suitable for including an a Gemfile"
-  (let ((formatted (helm-rubygems-gemfile-format gem-candidate)))
+  (let ((formatted (rubygems.org-candidate-gemfile-format gem-candidate)))
     (kill-new formatted)
     (message formatted)))
 
-(defun helm-rubygems-candidate-browse-to-project (gem-candidate)
+(defun helm-rubygems-org-candidate-browse-to-project (gem-candidate)
   "Opens a browser to project_uri of the GEM-CANDIDATE"
   (helm-browse-url
    (rubygems.org-gem-descriptor 'project_uri gem-candidate)))
 
-(defun helm-rubygems-candidate-browse-to-source (gem-candidate)
+(defun helm-rubygems-org-candidate-browse-to-source (gem-candidate)
   "Opens a browser to source_code_uri of then GEM-CANDIDATE"
   (let ((source-code-uri (rubygems.org-gem-descriptor
 			  'source_code_uri gem-candidate)))
     (if source-code-uri
 	(helm-browse-url source-code-uri)
-      (helm-rubygems-candidate-browse-to-project gem-candidate))))
+      (helm-rubygems-org-candidate-browse-to-project gem-candidate))))
 
-(defun helm-rubygems-api-key-derive (key-or-file)
+(defun helm-rubygems-org-api-key-derive (key-or-file)
   "PASS a string or a path to the rubygems.org YAML credentials fil, returns API key used to authenticate request"
   (cond
    ((eq key-or-file nil)
@@ -172,7 +172,7 @@
 		  gem-candidate))
 	  (rubygems.org-search
 	   helm-pattern
-	   (helm-rubygems-api-key-derive helm-rubygems-org-api-key))))
+	   (helm-rubygems-org-api-key-derive helm-rubygems-org-api-key))))
 
 (defvar helm-rubygems-org-search-source
   '((name . "Rubygems.org")
@@ -180,10 +180,10 @@
     (volatile)
     (delayed)
     (requires-pattern . 2)
-    (action . (("Copy gemfile require" .       helm-rubygems-candidate-to-kill-ring)
-	       ("Browse source code project" . helm-rubygems-candidate-browse-to-source)
-	       ("Browse on rubygems.org" .     helm-rubygems-candidate-browse-to-project)
-	       ("View Description" .           helm-rubygems-org-gem-description-view)))))
+    (action . (("Copy gemfile require" .       helm-rubygems-org-candidate-to-kill-ring)
+	       ("Browse source code project" . helm-rubygems-org-candidate-browse-to-source)
+	       ("Browse on rubygems.org" .     helm-rubygems-org-candidate-browse-to-project)
+	       ("View Description" .           helm-rubygems-org-candidate-view)))))
 
 (defun helm-rubygems-org ()
   "List Rubygems"
