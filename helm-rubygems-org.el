@@ -47,7 +47,7 @@
 		 (string :tag "API Key")))
 
 (defun helm-rubygems-org-candidate-view (gem-candidate)
-  "Given a deserialized JSON gem representation, show a description of the gem in a new buffer"
+  "Given a deserialized JSON gem representation GEM-CANDIDATE, show a description of the gem in a new buffer"
   (let* ((name (rubygems.org-gem-descriptor 'name gem-candidate))
 	 (buffer-name
 	  (format "*rubygems.org: %s*" name)))
@@ -110,20 +110,20 @@
 			    candidates))))
 
 (defun rubygems.org-gem-descriptor (descriptor gem-candidate)
-  "Returns the value descriptor by the DESCRIPTOR symbol for GEM-CANDIDATE parsed rubygems resource representation"
+  "Returns the value descriptor by the DESCRIPTOR symbol for parsed rubygems.org resource representation GEM-CANDIDATE"
   (let ((descriptor-cell (assoc descriptor gem-candidate)))
     (if descriptor-cell
 	(cdr descriptor-cell)
       nil)))
 
 (defun rubygems.org-candidate-gemfile-format (gem-candidate)
-  "Returns a string suitable for inclusion in a Gemfile; gem '<gem name>', '~> <version>"
+  "Given a GEM-CANDIDATE (deserialized JSON representation), returns a string suitable for inclusion in a Gemfile; gem '<gem name>', '~> <version>'"
   (format "gem '%s', '~> %s'"
 	  (rubygems.org-gem-descriptor 'name gem-candidate)
 	  (rubygems.org-gem-descriptor 'version gem-candidate)))
 
 (defun helm-rubygems-org-candidate-to-kill-ring (gem-candidate)
-  "Populates the kill-ring with a string suitable for including an a Gemfile"
+  "Given a GEM-CANDIDATE (deserialized JSON representation), populates the kill-ring with a string suitable for including an a Gemfile"
   (let ((formatted (rubygems.org-candidate-gemfile-format gem-candidate)))
     (kill-new formatted)
     (message formatted)))
@@ -142,7 +142,7 @@
       (helm-rubygems-org-candidate-browse-to-project gem-candidate))))
 
 (defun helm-rubygems-org-api-key-derive (key-or-file)
-  "PASS a string or a path to the rubygems.org YAML credentials fil, returns API key used to authenticate request"
+  "PASS a string or a path to the rubygems.org YAML credentials file, returns API key used to authenticate requests"
   (cond
    ((eq key-or-file nil)
     (error "Missing rubygems API key; please customize group helm-rubygems-org"))
