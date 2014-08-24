@@ -1,6 +1,5 @@
-;;; -*- lexical-binding: t -*-
+;;; helm-rubygems-org.el --- -*- lexical-binding: t -*-
 
-;;; helm-rubygems-org.el ---
 ;; Copyright (C) 2014 Chad Albers
 
 ;; Author: Chad Albers <calbers@neomantic.com>
@@ -30,7 +29,7 @@
 ;; Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
 ;; Boston, MA 02110-1301, USA.
 
-;;; Commentary
+;;; Commentary:
 ;; A helm interface to rubygems.org
 ;;
 ;; Requirements: a rubygems account and it's API key.
@@ -211,3 +210,4 @@
   (helm :sources 'helm-rubygems-org-search-source :buffer "*helm-rubygems*"))
 
 (provide 'helm-rubygems-org)
+;;; filename ends here
