@@ -8,7 +8,7 @@
 ;; Created: 25th August 2014
 ;; Version: 0.0.1
 ;; Keywords: ruby, rubygems, gemfile, helm
-;; Package-Requires: ((emacs "24") (helm "20140705.320") (cl-lib "0.5"))
+;; Package-Requires: ((emacs "24") (helm "1.6.3") (cl-lib "0.5"))
 
 ;; This file is NOT part of GNU Emacs.
 
