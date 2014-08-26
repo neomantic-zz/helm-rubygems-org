@@ -220,4 +220,4 @@
   (helm :sources 'helm-rubygems-org-search-source :buffer "*helm-rubygems*"))
 
 (provide 'helm-rubygems-org)
-;;; filename ends here
+;;; helm-rubygems-org.el ends here
